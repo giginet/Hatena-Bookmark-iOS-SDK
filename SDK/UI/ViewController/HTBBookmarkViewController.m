@@ -85,21 +85,23 @@
         _canonicalRequestFinished = YES;
         _canonicalEntry = entry;
         [self handleCanonicalURL];
+        if (entry.canonicalURL) {
+            [self getBookmarkedEntryWithURL:entry.canonicalURL success:^(HTBBookmarkedDataEntry *bookmarked) {
+                if (bookmarked) {
+                    self.URL = entry.canonicalURL;
+                } else {
+                    [self.rootView.myBookmarkActivityIndicatorView startAnimating];
+                    [self getBookmarkedEntryWithURL:self.URL success:nil];
+                }
+            }];
+        } else {
+            [self getBookmarkedEntryWithURL:self.URL success:nil];
+        }
     } failure:^(NSError *error) {
         [self handleHTTPError:error];
         _canonicalRequestFinished = YES;
         [self handleCanonicalURL];
         // handle auth
-    }];
-
-    [[HTBHatenaBookmarkManager sharedManager] getBookmarkedDataEntryWithURL:self.URL success:^(HTBBookmarkedDataEntry *entry) {
-        [self setBookmarkedDataEntry:entry];
-        [self.rootView.myBookmarkActivityIndicatorView stopAnimating];
-
-    } failure:^(NSError *error) {
-        [self handleHTTPError:error];
-
-        [self.rootView.myBookmarkActivityIndicatorView stopAnimating];
     }];
 
     if ([HTBUserManager sharedManager].myEntry) {
@@ -271,4 +273,18 @@
     [self.rootView.commentTextView resignFirstResponder];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+- (void)getBookmarkedEntryWithURL:(NSURL *)url success:(void (^)(HTBBookmarkedDataEntry *entry))success
+{
+    [[HTBHatenaBookmarkManager sharedManager] getBookmarkedDataEntryWithURL:url success:^(HTBBookmarkedDataEntry *entry) {
+        [self setBookmarkedDataEntry:entry];
+        [self.rootView.myBookmarkActivityIndicatorView stopAnimating];
+        if (success) success(entry);
+    } failure:^(NSError *error) {
+        [self handleHTTPError:error];
+
+        [self.rootView.myBookmarkActivityIndicatorView stopAnimating];
+    }];
+}
+
 @end
