@@ -10,3 +10,6 @@
 [submodule "HatenaBookmarkSDKTests/Kiwi"]
 	path = HatenaBookmarkSDKTests/Kiwi
 	url = https://github.com/allending/Kiwi.git
+[submodule "DemoAppForAutomation/tuneup_js"]
+	path = DemoAppForAutomation/tuneup_js
+	url = https://github.com/giginet/tuneup_js.git

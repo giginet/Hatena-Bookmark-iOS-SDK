@@ -1,4 +1,8 @@
 language: objective-c
 
+before_script:
+  - brew update
+  - brew install imagemagick
+
 script:
-  - make clean test
+  - rake test
